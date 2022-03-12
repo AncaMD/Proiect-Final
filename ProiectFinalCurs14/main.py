@@ -1,5 +1,9 @@
 import openpyxl
+from openpyxl.chart import (PieChart, Reference)
 from tkinter import *
+from win32com import client
+
+
 root = Tk()
 root.geometry('400x400')
 #root.resizable(0,0)
@@ -11,6 +15,7 @@ tester_str = StringVar()
 Entry(root, textvariable=tester_str).pack()
 
 path=r"D:\Anca\Git\Proiect Final\Proiect-Final\Test_Case_Anca_Dinu.xlsx"
+path_PDF=r"D:\Anca\Git\Proiect Final\Proiect-Final\Test_Case_Anca_Dinu.pdf"
 
 values=[0,0]
 passString = 'PASS'
@@ -55,6 +60,33 @@ def generateReport():
     reportSheet['A4'] = 'Total number of test cases'
     reportSheet['B4'] = values[0] + values[1]
     wb.save(path)
+    createChart()
+
+    excel = client.Dispatch("Excel.Application")
+
+    sheets = excel.Workbooks.Open(path)
+    work_sheets = sheets.Worksheets[2]
+    work_sheets.ExportAsFixedFormat(0, path_PDF)
+
+def createChart():
+    wb = openpyxl.load_workbook(path, read_only=False)
+    sheet = wb['Report'] #reportSheet = wb.get_sheet_by_name('Report')
+    pie = PieChart()
+
+    labels = Reference(sheet, min_col=1, min_row=2, max_row=3)
+    data = Reference(sheet, min_col=2, min_row=2, max_row=3)
+    pie.add_data(data, titles_from_data=False)
+    pie.set_categories(labels)
+    pie.title = "Test Cases"
+
+    pie.width = 14
+    pie.height = 7
+    s = pie.series[0]
+
+    s.graphicalProperties.line.solidFill = "00000"
+
+    sheet.add_chart(pie, 'A6')
+    wb.save(path)
 
 
 
@@ -62,6 +94,9 @@ def buttonPressed():
     #print('Button Pressed')
     compareValues()
     generateReport()
+
+
+
 
 Button(root, text='Generate Report', command=buttonPressed).pack(pady=10)
 
