@@ -6,7 +6,6 @@ from win32com import client
 
 root = Tk()
 root.geometry('400x400')
-#root.resizable(0,0)
 root.title('Test Cases Parser')
 Label(root, text='Test Cases Parser', font=' arial 25 bold').pack()
 
@@ -20,33 +19,31 @@ path_PDF=r"D:\Anca\Git\Proiect Final\Proiect-Final\Test_Case_Anca_Dinu.pdf"
 values=[0,0]
 passString = 'PASS'
 failString = 'FAIL'
-#failTestCasesCounter = 0
-#passTestCasesCounter = 0
+
 
 def compareValues():
     wb = openpyxl.load_workbook(path, read_only=False)
-    testCasesSheet = wb.get_sheet_by_name('test cases')
+    testCasesSheet = wb['test cases']
     for row in range(11, int(testCasesSheet.max_row + 1)):
         if testCasesSheet.cell(row=row, column=7).value == passString.upper():
             values[0] = values[0]+1
-            #passTestCasesCounter = passTestCasesCounter + 1
+
         elif testCasesSheet.cell(row=row, column=7).value == failString.upper():
             values[1]=values[1]+1
-            #failTestCasesCounter = failTestCasesCounter + 1
-    #totalTestCases_counter = failTestCasesCounter + passTestCasesCounter
-    #totalTestCases_counter = values[1]+values[0]
-    #print("Total teste Fail: ", values[1])
-    #print("Total teste Pass: ", values[0])
-    #print('Total Teste: ', totalTestCases_counter)
+
+    totalTestCases_counter = values[1]+values[0]
+    print("Total teste Fail: ", values[1])
+    print("Total teste Pass: ", values[0])
+    print('Total Teste: ', totalTestCases_counter)
 
 def generateReport():
     wb = openpyxl.load_workbook(path, read_only=False)
 
-    first_sheet = wb.get_sheet_by_name('test cases')
+    first_sheet = wb['test cases']
     tester = first_sheet['E1'].value
 
     try:
-        reportSheet = wb.get_sheet_by_name('Report')
+        reportSheet = wb['Report']
     except:
         wb.create_sheet('Report')
         reportSheet = wb.get_sheet_by_name('Report')
@@ -70,7 +67,7 @@ def generateReport():
 
 def createChart():
     wb = openpyxl.load_workbook(path, read_only=False)
-    sheet = wb['Report'] #reportSheet = wb.get_sheet_by_name('Report')
+    sheet = wb['Report']
     pie = PieChart()
 
     labels = Reference(sheet, min_col=1, min_row=2, max_row=3)
@@ -91,7 +88,7 @@ def createChart():
 
 
 def buttonPressed():
-    #print('Button Pressed')
+
     compareValues()
     generateReport()
 
@@ -101,7 +98,6 @@ def buttonPressed():
 Button(root, text='Generate Report', command=buttonPressed).pack(pady=10)
 
 root.mainloop()
-
 
 
 
